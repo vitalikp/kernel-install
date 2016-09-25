@@ -1,0 +1,26 @@
+#!/bin/bash
+
+cmd="$1"
+ver="$2"
+img="$3"
+
+case $cmd in
+	add)
+		if ! [[ $img ]]; then
+			exit 1
+		fi
+
+		cp $img /boot/vmlinuz-$ver
+		grub2-mkconfig -o /boot/grub2/grub.cfg
+	;;
+	remove)
+		rm /boot/vmlinuz-$ver
+		grub2-mkconfig -o /boot/grub2/grub.cfg
+	;;
+	*)
+        echo "unknown cmd '$cmd'" >&2
+        exit 1
+    ;;
+esac
+
+exit 0
