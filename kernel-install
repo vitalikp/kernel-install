@@ -4,9 +4,8 @@
 
 usage()
 {
-    echo "Usage:"
-    echo "        $0 add KERNEL-VERSION KERNEL-IMAGE"
-    echo "        $0 remove KERNEL-VERSION"
+    echo "Usage: $0 [add|remove] VERSION IMAGE"
+    echo -e "\ncalls install scripts to add(remove) kernel image IMAGE with VERSION to(from) /boot directory"
 }
 
 dropindirs_sort()
@@ -45,16 +44,16 @@ for i in "$@"; do
 done
 
 if [[ "${0##*/}" == 'installkernel' ]]; then
-    COMMAND='add'
+    cmd='add'
 else
-    COMMAND="$1"
+    cmd="$1"
     shift
 fi
 
-KERNEL_VERSION="$1"
-KERNEL_IMAGE="$2"
+ver="$1"
+img="$2"
 
-if [[ ! $COMMAND ]] || [[ ! $KERNEL_VERSION ]]; then
+if [[ ! $cmd ]] || [[ ! $ver ]]; then
     echo "Not enough arguments" >&2
     exit 1
 fi
@@ -67,16 +66,16 @@ readarray -t PLUGINS < <(
         "/usr/lib/kernel/install.d"
 )
 
-case $COMMAND in
+case $cmd in
     add)
-        if [[ ! "$KERNEL_IMAGE" ]]; then
-            echo "Command 'add' requires an argument" >&2
+        if [[ ! "$img" ]]; then
+            echo "command 'add' requires an argument" >&2
             exit 1
         fi
 
         for f in "${PLUGINS[@]}"; do
             if [[ -x $f ]]; then
-                "$f" add "$KERNEL_VERSION" "$KERNEL_IMAGE"
+                "$f" add "$ver" "$img"
                 ((ret+=$?))
             fi
         done
@@ -85,14 +84,14 @@ case $COMMAND in
     remove)
         for f in "${PLUGINS[@]}"; do
             if [[ -x $f ]]; then
-                "$f" remove "$KERNEL_VERSION"
+                "$f" remove "$ver"
                 ((ret+=$?))
             fi
         done
         ;;
 
     *)
-        echo "Unknown command '$COMMAND'" >&2
+        echo "unknown command '$cmd'" >&2
         exit 1
         ;;
 esac
