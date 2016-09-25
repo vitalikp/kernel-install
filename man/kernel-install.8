@@ -1,0 +1,87 @@
+.TH KERNEL-INSTALL 8 "September 2016" "kernel-install" "Kernel Install Manual"
+
+.SH "NAME"
+kernel-install \- add and remove kernel and initramfs images to and from /boot
+
+.SH "SYNOPSIS"
+
+.HP \w'\fBkernel\-install\fR\ 'u
+\fBkernel\-install\fR [\fIadd\fR|\fIremove\fR] \fIversion\fR [\fIimage\fR]
+
+.SH "DESCRIPTION"
+.PP
+\fBkernel\-install\fR
+is used to install and remove kernel and initramfs images to and from
+/boot\&.
+.PP
+\fBkernel\-install\fR
+will execute the files located in the directory
+/usr/lib/kernel/install\&.d/
+and the local administration directory
+/etc/kernel/install\&.d/\&. All files are collectively sorted and executed in lexical order, regardless of the directory in which they live\&. However, files with identical filenames replace each other\&. Files in
+/etc/kernel/install\&.d/
+take precedence over files with the same name in
+/usr/lib/kernel/install\&.d/\&. This can be used to override a system\-supplied executables with a local file if needed; a symbolic link in
+/etc/kernel/install\&.d/
+with the same name as an executable in
+/usr/lib/kernel/install\&.d/, pointing to /dev/null, disables the executable entirely\&. Executables must have the extension
+"\&.install"; other extensions are ignored\&.
+
+.SH "COMMANDS"
+
+.PP
+The following commands are understood:
+
+.PP
+\fBadd \fR\fB\fIversion\fR\fR\fB \fR\fB\fIimage\fR\fR
+.RS 4
+\fBkernel\-install\fR
+calls every executable
+/usr/lib/kernel/install\&.d/*\&.install
+and
+/etc/kernel/install\&.d/*\&.install
+with the arguments
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+add \fIversion\fR \fIimage\fR
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+The kernel\-install plugin
+50\-depmod\&.install
+runs depmod for the
+\fIversion\fR\&.
+.RE
+
+.PP
+\fBremove \fR\fB\fIversion\fR\fR
+.RS 4
+Calls every executable
+/usr/lib/kernel/install\&.d/*\&.install
+and
+/etc/kernel/install\&.d/*\&.install
+with the arguments
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+remove \fIversion\fR
+
+.SH "EXIT STATUS"
+
+.PP
+If every executable returns with 0, 0 is returned, a non\-zero failure code otherwise\&.
+
+.SH "FILES"
+
+.PP
+/usr/lib/kernel/install\&.d/*\&.install /etc/kernel/install\&.d/*\&.install
+.RS 4
+Drop\-in files which are executed by kernel\-install\&.
+.RE
